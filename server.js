@@ -9,6 +9,7 @@ const mongoose = require('mongoose')
 const session = require('express-session')
 const flash = require('express-flash')
 const MongoDbStore = require('connect-mongo')(session)
+const passport = require('passport')
 
 
 //database connection
@@ -22,7 +23,11 @@ connection.once('open', () => {
 //     console.log('Connection-Failed...')
 // });
 
-
+// //passport config
+// const passportInit = require('./app/config/passport')
+// passportInit(passport)
+// app.use(passport.initialize())
+// app.use(passport.session())
 // session store
 
 let mongoStore = new MongoDbStore({
@@ -40,7 +45,11 @@ app.use(session({
     cookie: { maxAge: 3000 * 60 * 60 * 24 } // 24 hours
 }))
 
-
+//passport config
+const passportInit = require('./app/config/passport')
+passportInit(passport)
+app.use(passport.initialize())
+app.use(passport.session())
 
 // use flash as middleware
 app.use(flash())
@@ -50,12 +59,13 @@ app.use(flash())
 //WHERE ARE THEY(ASSET)
 // app.use(express.static('public'))
 app.use(express.static('public'))
-
+app.use(express.urlencoded({extended:false}))
 app.use(express.json())
 
 //global middleware
 app.use((req,res,next)=>{
  res.locals.session = req.session
+ res.locals.user =req.user
  next()
 })
 
