@@ -10,7 +10,7 @@ const session = require('express-session')
 const flash = require('express-flash')
 const MongoDbStore = require('connect-mongo')(session)
 const passport = require('passport')
-
+const Emitter = require('events')
 
 //database connection
 const url = 'mongodb://localhost/pizza';
@@ -31,9 +31,13 @@ connection.once('open', () => {
 // session store
 
 let mongoStore = new MongoDbStore({
-      mongooseConnection: connection,
-       collection: "sessions"
+    mongooseConnection: connection,
+    collection: "sessions"
 })
+
+//event emitter
+const eventEmitter = new Emitter()
+app.set('eventEmitter', eventEmitter)
 
 //session-config
 
@@ -59,14 +63,14 @@ app.use(flash())
 //WHERE ARE THEY(ASSET)
 // app.use(express.static('public'))
 app.use(express.static('public'))
-app.use(express.urlencoded({extended:false}))
+app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
 //global middleware
-app.use((req,res,next)=>{
- res.locals.session = req.session
- res.locals.user =req.user
- next()
+app.use((req, res, next) => {
+    res.locals.session = req.session
+    res.locals.user = req.user
+    next()
 })
 
 // set template engine 
@@ -75,7 +79,28 @@ app.set('views', path.join(__dirname, '/resource/views'))
 app.set('view engine', 'ejs')
 require('./routes/web')(app)
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log("listening on port 3300")
 })
 
+//Socket 
+
+const io = require('socket.io')(server)
+io.on('connection', (socket) => {
+    //join 
+    console.log(socket.id)
+    socket.on('join', (orderId) => {
+        socket.join(orderId)
+    })
+
+})
+
+
+eventEmitter.on('orderUpdated', (data) =>{
+io.to(`order_${data.id}`).emit('orderUpdated', data)
+})
+
+
+eventEmitter.on('orderPlaced', () =>{
+io.to('adminRoom').emit('orderPlaced', data)
+})

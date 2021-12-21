@@ -1,4 +1,3 @@
-
 function cartController() {
     return {
         index(req, res) {
@@ -7,14 +6,13 @@ function cartController() {
 
         update(req, res) {
             //for the first time creating cart and adding basic structure
-            if (!req.session.cart)
-
+            if (!req.session.cart){
                 req.session.cart = {
                     items: {},
                     totalQty: 0,
                     totalPrice: 0
                 }
-
+            }
             let cart = req.session.cart
 
             // cheak if item doesn't exist in cart
