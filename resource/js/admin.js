@@ -13,6 +13,7 @@ export function initAdmin(socket) {
         }
     }).then(res => {
         orders = res.data
+        //  console.log(res.data)
         markup = generateMarkup(orders)
         orderTableBody.innerHTML = markup
     }).catch(err => {
@@ -23,11 +24,11 @@ export function initAdmin(socket) {
         let parsedItems = Object.values(items)
         return parsedItems.map((menuItem) => {
             return `
-                <p>${ menuItem.item.name } - ${ menuItem.qty } pcs </p>
+                <p>${ menuItem.name } - ${ menuItem.qty } pcs </p>
             `
         }).join('')
       }
-
+    
     function generateMarkup(orders) {
         return orders.map(order => {
             return `
@@ -40,7 +41,7 @@ export function initAdmin(socket) {
                 <td class="border px-4 py-2">${ order.address }</td>
                 <td class="border px-4 py-2">
                     <div class="inline-block relative w-64">
-                        <form action="/admin/order/status" method="POST">
+                        <form action="/admin/orders/status" method="POST">
                             <input type="hidden" name="orderId" value="${ order._id }">
                             <select name="status" onchange="this.form.submit()"
                                 class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
@@ -87,7 +88,6 @@ export function initAdmin(socket) {
             type: 'success',
             timeout: 1000,
             text: 'New order!',
-            progressBar: false,
         }).show();
         orders.unshift(order)
         orderTableBody.innerHTML = ''

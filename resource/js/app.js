@@ -17,7 +17,8 @@ function updateCart(pizza) {
         new Noty({
             type: 'success',
             timeout: 1000,
-            text: 'Item Added To Cart'
+            text: 'Item Added To Cart',
+            
         }).show();
     }).catch(err => {
 
@@ -63,6 +64,7 @@ function updateStatus(order) {
     statuses.forEach((status) => {
         status.classList.remove('step-completed')
         status.classList.remove('current')
+
     })
     let stepCompleted = true;
     statuses.forEach((status) => {
@@ -90,7 +92,7 @@ updateStatus(order)
 
 let socket = io()
 
-initAdmin(socket)
+
 // join 
 
 if (order) {
@@ -99,22 +101,23 @@ if (order) {
 // order_nhihiljnioh8jiji
 
 let adminAreaPath = window.location.pathname
-console.log(adminAreaPath)
+
 if (adminAreaPath.includes('admin')) {
+    initAdmin(socket)
     socket.emit('join', 'adminRoom')
 
 }
 
-socket.on('orederUpdated', (data) => {
+socket.on('orderUpdated', (data) => {
     const updatedOrder = { ...order }
     updatedOrder.updatedAt = moment().format()
     updatedOrder.status = data.status
-    updatedStatus(updatedOrder)
+    updateStatus(updatedOrder)
     new Noty({
         type: 'success',
         timeout: 1000,
-        text: 'Order Updated'
+        text: data.status
     }).show();
-    console.log(data)
+    // console.log(data)
 }
 )

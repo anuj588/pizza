@@ -19,7 +19,8 @@ function cartController() {
 
             if (!cart.items[req.body._id]) {
                 cart.items[req.body._id] = {
-                    items: req.body,
+                    // items: req.body,
+                    item: req.body,
                     qty: 1
                 }
                 // if cart has something before then add new new qty also

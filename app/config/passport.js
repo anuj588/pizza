@@ -8,7 +8,7 @@ function init(passport) {
     passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
         // login
         //cheak if user exist
-       const user = await User.findOne({ eamil: email })
+       const user = await User.findOne({ email: email })
         if (!user) {
             return done(null, false, { message: 'No user with this email' })
         }

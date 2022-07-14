@@ -1,10 +1,10 @@
-require('dotenv').config()
+ require('dotenv').config()
 const express = require('express')
 const app = express();
 const ejs = require('ejs')
 const path = require('path')
 const expressLayout = require('express-ejs-layouts')
-const PORT = process.env.PORT || 3300;
+const PORT = process.env.PORT || 3000;
 const mongoose = require('mongoose')
 const session = require('express-session')
 const flash = require('express-flash')
@@ -23,12 +23,6 @@ connection.once('open', () => {
 //     console.log('Connection-Failed...')
 // });
 
-// //passport config
-// const passportInit = require('./app/config/passport')
-// passportInit(passport)
-// app.use(passport.initialize())
-// app.use(passport.session())
-// session store
 
 let mongoStore = new MongoDbStore({
     mongooseConnection: connection,
@@ -46,7 +40,7 @@ app.use(session({
     resave: false,
     store: mongoStore,
     saveUninitialized: false,
-    cookie: { maxAge: 3000 * 60 * 60 * 24 } // 24 hours
+    cookie: { maxAge: 600000} // 24 hours
 }))
 
 //passport config
@@ -77,10 +71,14 @@ app.use((req, res, next) => {
 app.use(expressLayout)
 app.set('views', path.join(__dirname, '/resource/views'))
 app.set('view engine', 'ejs')
+
 require('./routes/web')(app)
+// app.use((req, res) =>{
+//     req.statusCode(404).render('errors/404')
+// })
 
 const server = app.listen(PORT, () => {
-    console.log("listening on port 3300")
+    console.log("listening on port 3000")
 })
 
 //Socket 
@@ -88,7 +86,7 @@ const server = app.listen(PORT, () => {
 const io = require('socket.io')(server)
 io.on('connection', (socket) => {
     //join 
-    console.log(socket.id)
+    // console.log(socket.id)
     socket.on('join', (orderId) => {
         socket.join(orderId)
     })
@@ -101,6 +99,6 @@ io.to(`order_${data.id}`).emit('orderUpdated', data)
 })
 
 
-eventEmitter.on('orderPlaced', () =>{
+eventEmitter.on('orderPlaced', (data) =>{
 io.to('adminRoom').emit('orderPlaced', data)
 })
